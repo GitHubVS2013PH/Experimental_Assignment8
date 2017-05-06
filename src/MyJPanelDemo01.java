@@ -39,7 +39,7 @@ public class MyJPanelDemo01 extends JPanel
 
         // draw x-axis and ticks
         g.drawLine(xAxisBegin, yAxisBegin, xAxisEnd, yAxisBegin);
-        DrawXAxisTicks(28, 2000, g);
+        DrawXAxisTicksAndLabels(28, 2000, g);
 
         // draw y-axis and ticks
         g.drawLine(xAxisBegin, yAxisBegin, xAxisBegin, yAxisEnd);
@@ -190,24 +190,7 @@ public class MyJPanelDemo01 extends JPanel
 
     }
 
-    // DOESN'T WORK FOR NUMYEARS = 1
-/*    private void DrawXAxisTicks(int numYears, int startYear, Graphics g) {
-        if (numYears <= 1)
-            return;
-
-        int numYearLabels =  findNumberYearIntervals(numYears) + 1;
-        double spacing = (xAxisEnd - xAxisBegin) / ((double) numYears - 1);
-        int tickTop = yAxisBegin - TICK_SIZE / 2;
-        int tickBtm = yAxisBegin + TICK_SIZE / 2;
-
-        for (int i = 0; i < numYears; ++i) {
-            int xPos = xAxisBegin + (int) (i * spacing);
-            g.drawLine(xPos, tickTop, xPos, tickBtm);
-            g.drawString(Integer.toString(startYear + i), xPos - DATE_SHIFT, yAxisBegin + 2*TICK_SIZE);
-        }
-    } */
-
-    private void DrawXAxisTicks(int numYears, int startYear, Graphics g) {
+    private void DrawXAxisTicksAndLabels(int numYears, int startYear, Graphics g) {
         if (numYears <= 1)
             return;
 
