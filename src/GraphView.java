@@ -10,24 +10,21 @@ import java.awt.*;
  */
 public class GraphView extends JPanel {
     final private int width, height, numYears;
-    // final private double plottedXmin, plottedXmax, plottedYmin, plottedYmax;
+    private int plottedXmin, plottedXmax, plottedYmin, plottedYmax;
     private Font font;
 
-    private final int YEARS_FOR_MAX = 10;
-    private LinkedList<ColoredPoint> graphPoints = new LinkedList<>();
+    final private int YEARS_FOR_MAX = 10;
+    final private LinkedList<ColoredPoint> graphPoints = new LinkedList<>();
 
     final int MARGIN = 40, TICK_SIZE = 10, POINT_SIZE = 10;
     final int DATA_SHIFT = 35, DATE_SHIFT = 13;
     final int MAX_X_INTERVALS = 10, NUM_Y_INTERVALS = 10;
-    int xAxisBegin, xAxisEnd, yAxisBegin, yAxisEnd;
     final private int dataMinX, dataMaxX;
     final private double dataMinY = 0.0, dataMaxY;
 
-    private static Color[] colorArray = {Color.black, Color.blue, Color.cyan,
+    final private static Color[] colorArray = {Color.black, Color.blue, Color.cyan,
             Color.darkGray, Color.green, Color.lightGray, Color.magenta,
             Color.orange, Color.pink, Color.red, Color.yellow};
-
-    final double TEST_MAX_Y = 800;                                  // FOR INITIAL TEST ONLY
 
     public GraphView(int width, int height, LinkedList<Country> countries) {
         //super(new GridLayout(1,1, 40,40)); // Call layout manager
@@ -36,18 +33,11 @@ public class GraphView extends JPanel {
         this.height = height;
         font = new Font("Serif", Font.PLAIN, 11);
 
-//        // map method parameters
-//        plottedYmin = height - MARGIN;
-//        plottedYmax = MARGIN;
-//        plottedXmin = MARGIN;
-//        plottedXmax = width - MARGIN;
-
-
-//        // initialize graph variables
-//        xAxisBegin = MARGIN;
-//        yAxisBegin = getHeight() - MARGIN;
-//        xAxisEnd = getWidth() - MARGIN;
-//        yAxisEnd = MARGIN;
+        // map method parameters
+        plottedXmin = MARGIN;
+        plottedYmin = height - MARGIN;
+        plottedXmax = width - MARGIN;
+        plottedYmax = MARGIN;
 
         // Set X-axis min and max
         dataMinX = countries.getIndex(0).getStartYear();
@@ -71,8 +61,8 @@ public class GraphView extends JPanel {
         for(Country country : countries) {
             SubscriptionYear[] subYears = country.getSubscriptions();
             for(SubscriptionYear subYear : subYears) {
-                double mappedX = map(subYear.getYear(), dataMinX, dataMaxX, xAxisBegin, xAxisEnd) - POINT_SIZE / 2;
-                double mappedY = map(subYear.getSubscriptions(), dataMinY, dataMaxY, yAxisBegin, yAxisEnd) - POINT_SIZE / 2;
+                double mappedX = map(subYear.getYear(), dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
+                double mappedY = map(subYear.getSubscriptions(), dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
                 Color pntColor = colorArray[countryCntr % colorArray.length];
                 ColoredPoint tempPnt = new ColoredPoint(pntColor, mappedX, mappedY, subYear.getYear(), subYear.getSubscriptions());
                 graphPoints.add(tempPnt);
@@ -97,65 +87,57 @@ public class GraphView extends JPanel {
         //setSize(width, height);
 
         // initialize graph variables
-        xAxisBegin = MARGIN;
-        yAxisBegin = getHeight() - MARGIN;
-        xAxisEnd = getWidth() - MARGIN;
-        yAxisEnd = MARGIN;
-
-//        xAxisBegin = MARGIN;
-//        yAxisBegin = (int)plottedYmin;
-//        xAxisEnd = (int)plottedXmax;
-//        yAxisEnd = MARGIN;
+//        plottedXmin = MARGIN;
+//        plottedYmin = getHeight() - MARGIN;
+//        plottedXmax = getWidth() - MARGIN;
+//        plottedYmax = MARGIN;
 
         // width = getWidth(); height = getHeight();
-        System.out.println("(In paintComponent) Width: " + width + " Height: " + height);
+        // System.out.println("(In paintComponent) Width: " + width + " Height: " + height);
 
         // draw x-axis and ticks
-        g.drawLine(xAxisBegin, yAxisBegin, xAxisEnd, yAxisBegin);
+        g.drawLine(plottedXmin, plottedYmin, plottedXmax, plottedYmin);
         DrawXAxisTicksAndLabels(numYears, dataMinX, g); // dataMinX is startYear
-        // DrawXAxisTicksAndLabels(28, 2000, g);
 
         // draw y-axis and ticks
-        g.drawLine(xAxisBegin, yAxisBegin, xAxisBegin, yAxisEnd);
+        g.drawLine(plottedXmin, plottedYmin, plottedXmin, plottedYmax);
         int numIntervals = findNumberYearIntervals(numYears);
         DrawYAxisTicksAndLabels(numIntervals, dataMaxY, g, false);
-        // DrawYAxisTicksAndLabels(5, TEST_MAX_Y, g);
 
         //g.drawString("Test", 300,300);
         //g.fillOval(400, 400, POINT_SIZE, POINT_SIZE);
 
         // testing ColorPoint including graphing it
-        ColoredPoint myPnt = new ColoredPoint(Color.BLUE, 400,400,2014,20.4);
-        g.setColor(myPnt.getColor());
-        g.fillOval((int)myPnt.getX(), (int)myPnt.getY(), POINT_SIZE, POINT_SIZE);
-        g.setColor(Color.BLACK);
+//        ColoredPoint myPnt = new ColoredPoint(Color.BLUE, 400,400,2014,20.4);
+//        g.setColor(myPnt.getColor());
+//        g.fillOval((int)myPnt.getX(), (int)myPnt.getY(), POINT_SIZE, POINT_SIZE);
+//        g.setColor(Color.BLACK);
         // g.drawString(myPnt.getLabel(),400,400);
 
         // place some points in known places (in the corners) for testing purposes
-        System.out.println("(In paint component before test points) Height is: " + getHeight() + " width is: " + getWidth());
-        double mappedX = map(dataMinX, dataMinX, dataMaxX, xAxisBegin, xAxisEnd) - POINT_SIZE / 2;
-        double mappedY = map(dataMinY, dataMinY, dataMaxY, yAxisBegin, yAxisEnd) - POINT_SIZE / 2;
-        g.setColor(Color.BLUE);
-        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-
-        mappedX = map(dataMaxX, dataMinX, dataMaxX, xAxisBegin, xAxisEnd) - POINT_SIZE / 2;
-        mappedY = map(dataMinY, dataMinY, dataMaxY, yAxisBegin, yAxisEnd) - POINT_SIZE / 2;
-        g.setColor(Color.RED);
-        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-
-        mappedX = map(dataMinX, dataMinX, dataMaxX, xAxisBegin, xAxisEnd) - POINT_SIZE / 2;
-        mappedY = map(dataMaxY, dataMinY, dataMaxY, yAxisBegin, yAxisEnd) - POINT_SIZE / 2;
-        g.setColor(Color.GREEN);
-        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-
-        mappedX = map(dataMaxX, dataMinX, dataMaxX, xAxisBegin, xAxisEnd) - POINT_SIZE / 2;
-        mappedY = map(dataMaxY, dataMinY, dataMaxY, yAxisBegin, yAxisEnd) - POINT_SIZE / 2;
-        g.setColor(Color.CYAN);
-        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-
+//        System.out.println("(In paint component before test points) Height is: " + getHeight() + " width is: " + getWidth());
+//        double mappedX = map(dataMinX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
+//        double mappedY = map(dataMinY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
+//        g.setColor(Color.BLUE);
+//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
+//
+//        mappedX = map(dataMaxX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
+//        mappedY = map(dataMinY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
+//        g.setColor(Color.RED);
+//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
+//
+//        mappedX = map(dataMinX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
+//        mappedY = map(dataMaxY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
+//        g.setColor(Color.GREEN);
+//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
+//
+//        mappedX = map(dataMaxX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
+//        mappedY = map(dataMaxY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
+//        g.setColor(Color.CYAN);
+//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
 
         // test colors
-        TestColorDots(g);
+//        TestColorDots(g);
 
         // graphs points in graphPoints LinkedList
         Color oldColor = g.getColor();
@@ -172,14 +154,14 @@ public class GraphView extends JPanel {
 
         int numYearLabels =  findNumberYearIntervals(numYears);
         int yearsPerInterval = findXIntervalSize(numYears, numYearLabels);
-        double spacing = (xAxisEnd - xAxisBegin) / ((double)numYearLabels);
-        int tickTop = yAxisBegin - TICK_SIZE / 2;
-        int tickBtm = yAxisBegin + TICK_SIZE / 2;
+        double spacing = (plottedXmax - plottedXmin) / ((double)numYearLabels);
+        int tickTop = plottedYmin - TICK_SIZE / 2;
+        int tickBtm = plottedYmin + TICK_SIZE / 2;
 
         for (int i = 0; i <= numYearLabels; ++i) {
-            int xPos = xAxisBegin + (int) (i * spacing);
+            int xPos = plottedXmin + (int) (i * spacing);
             g.drawLine(xPos, tickTop, xPos, tickBtm);
-            g.drawString(Integer.toString(startYear + i * yearsPerInterval), xPos - DATE_SHIFT, yAxisBegin + 2*TICK_SIZE);
+            g.drawString(Integer.toString(startYear + i * yearsPerInterval), xPos - DATE_SHIFT, plottedYmin + 2*TICK_SIZE);
         }
     }
 
@@ -219,17 +201,17 @@ public class GraphView extends JPanel {
         if (findTop)
             topYValue = findTopYValue(maxY);
 
-        double spacing = (yAxisBegin - yAxisEnd) / ((double)NUM_Y_INTERVALS);
+        double spacing = (plottedYmin - plottedYmax) / ((double)NUM_Y_INTERVALS);
         double yDelta = topYValue / ((double)NUM_Y_INTERVALS);
-        int tickLeft = xAxisBegin - TICK_SIZE / 2;
-        int tickRight = xAxisBegin + TICK_SIZE / 2;
+        int tickLeft = plottedXmin - TICK_SIZE / 2;
+        int tickRight = plottedXmin + TICK_SIZE / 2;
         String formatStr = makeFormatString(topYValue);
 
         for (int i = 0; i <= NUM_Y_INTERVALS; ++i) {
-            int yPos = yAxisBegin - (int)(i * spacing);
+            int yPos = plottedYmin - (int)(i * spacing);
             g.drawLine(tickLeft, yPos, tickRight, yPos);
             String dataStr = String.format(formatStr, yDelta * i);
-            g.drawString(dataStr, xAxisBegin - DATA_SHIFT, yPos + TICK_SIZE / 2);
+            g.drawString(dataStr, plottedXmin - DATA_SHIFT, yPos + TICK_SIZE / 2);
         }
     }
 
@@ -258,7 +240,7 @@ public class GraphView extends JPanel {
         Color oldColor = g.getColor();
         for (int i = 0; i < colorArray.length; ++i) {
             g.setColor(colorArray[i]);
-            g.fillOval(xAxisEnd, yAxisBegin - (i + 3) * 3 * POINT_SIZE, POINT_SIZE, POINT_SIZE);
+            g.fillOval(plottedXmax, plottedYmin - (i + 3) * 3 * POINT_SIZE, POINT_SIZE, POINT_SIZE);
         }
         g.setColor(oldColor);
     }

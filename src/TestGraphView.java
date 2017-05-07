@@ -2,20 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 
-/**
- * Created by Paul on 5/2/2017.
- */
+
 public class TestGraphView {
     public static void main(String[] args) {
         System.out.println("TestGraphView");
 
         final int WIDTH = 800, HEIGHT = 600;
-        final int NUM_RAND_COUNTRIES = 3;
+        final int NUM_RAND_COUNTRIES = 9;
 
         // establish main frame in which program will run:
         JFrame frmMyWindow = new JFrame("World Development Indicators");
         //frmMyWindow.setLocationRelativeTo(null);
-        frmMyWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frmMyWindow.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frmMyWindow.setSize(WIDTH, HEIGHT);
         System.out.println("Window size (after setSize) is: " + frmMyWindow.getSize() + " width is: " + frmMyWindow.getWidth());
 
@@ -23,14 +21,10 @@ public class TestGraphView {
         // repositioning code from: http://stackoverflow.com/questions/3480102/java-
         // jframe-setlocationrelativetonull-not-centering-the-window-on-ubuntu-10-0
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        // System.out.println("ScreenSize is: " + screenSize);
         Point middle = new Point(screenSize.width / 2, screenSize.height / 2);
         Point newLocation = new Point(middle.x - (frmMyWindow.getWidth() / 2),
                 middle.y - (frmMyWindow.getHeight() / 2));
         frmMyWindow.setLocation(newLocation);
-
-        // frmMyWindow.setVisible(true);                              // IS THIS NEEDED ???
-        //System.out.println("Window size (after first setVisbile is: " + frmMyWindow.getSize());
 
 /*
         MyJPanelDemo01 demo1 = new MyJPanelDemo01();
@@ -39,8 +33,8 @@ public class TestGraphView {
 */
        // Get array of countries and pick a random few for LinkedList
         LinkedList<Country> selectedCountries = new LinkedList<>();
-        // final String FILENAME = "resources/cellular.csv";	// Directory path for Mac OS X
-        final String FILENAME = "resources/cellular_short_oneDecade.csv";	// Directory path for Mac OS X
+        final String FILENAME = "resources/cellular.csv";	// Directory path for Mac OS X
+        // final String FILENAME = "resources/cellular_short_oneDecade.csv";	// Directory path for Mac OS X
         CSVReader parser = new CSVReader(FILENAME);
         String [] countryNames = parser.getCountryNames();
         int [] yearLabels = parser.getYearLabels();
@@ -68,8 +62,8 @@ public class TestGraphView {
         for (int i = 0; i < NUM_RAND_COUNTRIES; i++)
         {
             // Selects a random index of the cellularData.Country data array
-            // int selectedIndex = random.nextInt(allCountries.length);
-            int selectedIndex = i;
+            int selectedIndex = random.nextInt(allCountries.length);
+            // int selectedIndex = i;  // FOR DEBUGGING
             Country countryToAdd = allCountries[selectedIndex];
             System.out.printf("Adding country with name %s to the end of the list.\n", countryToAdd.getName());
             selectedCountries.add(countryToAdd);
@@ -80,8 +74,5 @@ public class TestGraphView {
         myGraphView.repaint();
         frmMyWindow.setVisible(true);
         System.out.println("Window size (after last setVisible) is: " + frmMyWindow.getSize());
-
-
-
     }
 }
