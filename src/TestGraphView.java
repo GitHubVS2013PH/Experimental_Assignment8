@@ -8,7 +8,7 @@ public class TestGraphView {
         System.out.println("TestGraphView");
 
         final int WIDTH = 800, HEIGHT = 600;
-        final int NUM_RAND_COUNTRIES = 9;
+        final int NUM_RAND_COUNTRIES = 11;
 
         // establish main frame in which program will run:
         JFrame frmMyWindow = new JFrame("World Development Indicators");

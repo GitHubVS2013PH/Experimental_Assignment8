@@ -149,6 +149,7 @@ public class LinkedList<E> implements Iterable<E> {
         public E next() throws NoSuchElementException {
             if (!hasNext())
                 throw new NoSuchElementException("LinkedList has no more elements.");
+
             E rtnVal = current.getData();
             current = current.getNext();
             return rtnVal;

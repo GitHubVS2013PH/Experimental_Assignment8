@@ -1,8 +1,5 @@
-import sun.awt.image.ImageWatched;
-
 import javax.swing.*;
 import java.awt.*;
-//import java.awt.Graphics;                                                       // NEEDED ??????
 
 /**
  * An object of this class maps the cellular data of a country to the width and
@@ -14,20 +11,29 @@ public class GraphView extends JPanel {
     private Font font;
 
     final private int YEARS_FOR_MAX = 10;
-    final private LinkedList<ColoredPoint> graphPoints = new LinkedList<>();
+    final private LegendPanel pntLegends = new LegendPanel();
+    final private LinkedList<ColoredPoint> graphPoints = new LinkedList<>();  // STRUCTURE SAME AS LEGENDS???
 
+    // Data plotting parameters
     final int MARGIN = 40, TICK_SIZE = 10, POINT_SIZE = 10;
     final int DATA_SHIFT = 35, DATE_SHIFT = 13;
     final int MAX_X_INTERVALS = 10, NUM_Y_INTERVALS = 10;
     final private int dataMinX, dataMaxX;
-    final private double dataMinY = 0.0, dataMaxY;
+    final private double dataMinY = 0.0, dataMaxY;                 // SHOULD THESE BE ALL CAPS?
+    final private double TOP_Y_VALUE_DEFAULT = 200.0;
 
+    // Legend graphing parameters
+    final int LBL_DX = 5, LBL_DY = 14; // text offset wrt label rectangle
+    final int LBL_WIDTH = 180, LBL_HEIGHT = 20, MONO_SIZE = 8; // label rectangle dimensions
+    final int LEG__X = 60, LEG_START_Y = 40, NEXT_LEG_Y = 25; // legend positions
+
+    // Color scheme
     final private static Color[] colorArray = {Color.black, Color.blue, Color.cyan,
             Color.darkGray, Color.green, Color.lightGray, Color.magenta,
             Color.orange, Color.pink, Color.red, Color.yellow};
 
     public GraphView(int width, int height, LinkedList<Country> countries) {
-        //super(new GridLayout(1,1, 40,40)); // Call layout manager
+        //super(new GridLayout(1,2, 40,40)); // Call layout manager
         // setSize(width,height);
         this.width = width;
         this.height = height;
@@ -60,25 +66,20 @@ public class GraphView extends JPanel {
         int countryCntr = 0;
         for(Country country : countries) {
             SubscriptionYear[] subYears = country.getSubscriptions();
+            Color pntColor = colorArray[countryCntr % colorArray.length];
             for(SubscriptionYear subYear : subYears) {
                 double mappedX = map(subYear.getYear(), dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
                 double mappedY = map(subYear.getSubscriptions(), dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
-                Color pntColor = colorArray[countryCntr % colorArray.length];
                 ColoredPoint tempPnt = new ColoredPoint(pntColor, mappedX, mappedY, subYear.getYear(), subYear.getSubscriptions());
                 graphPoints.add(tempPnt);
             }
+            pntLegends.add(country.getName(), pntColor);
             ++countryCntr;
         }
     }
 
-    static public final double map(double value, double dataMin, double dataMax, double plottedMin, double plottedMax)
-    {
-        double dPlot = (plottedMax - plottedMin);
-        double dValue = (value - dataMin);
-        double dData = (dataMax - dataMin);
-        double rtnVal = plottedMin + dPlot * (dValue / dData);
-        return rtnVal;
-        // return plottedMin + (plottedMax - plottedMin) * ((value - dataMin) / (dataMax - dataMin));
+    static public final double map(double value, double dataMin, double dataMax, double plottedMin, double plottedMax) {
+        return plottedMin + (plottedMax - plottedMin) * ((value - dataMin) / (dataMax - dataMin));
     }
 
     @Override
@@ -106,6 +107,22 @@ public class GraphView extends JPanel {
 
         //g.drawString("Test", 300,300);
         //g.fillOval(400, 400, POINT_SIZE, POINT_SIZE);
+
+//        int lblX = 80, lblY = 40, nxtY = 25;
+//        int lblDx = 5, lblDy = 14;
+//        LegendPanel.Country_Legend tmpLegend = pntLegends.getLegendList().getIndex(0);
+//        g.setColor(tmpLegend.getColor());
+//        g.fillRect(lblX,lblY,120,20);
+//        g.setColor(getComplimentColor(tmpLegend.getColor()));
+//        g.drawString(tmpLegend.getName(),lblX + lblDx,lblY + lblDy);
+//
+//        tmpLegend = pntLegends.getLegendList().getIndex(1);
+//        g.setColor(tmpLegend.getColor());
+//        g.fillRect(lblX,lblY + nxtY,120,20);
+//        g.setColor(getComplimentColor(tmpLegend.getColor()));
+//        g.drawString(tmpLegend.getName(),lblX + lblDx,lblY + lblDy + nxtY);
+
+
 
         // testing ColorPoint including graphing it
 //        ColoredPoint myPnt = new ColoredPoint(Color.BLUE, 400,400,2014,20.4);
@@ -136,7 +153,7 @@ public class GraphView extends JPanel {
 //        g.setColor(Color.CYAN);
 //        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
 
-        // test colors
+//        // test colors
 //        TestColorDots(g);
 
         // graphs points in graphPoints LinkedList
@@ -145,6 +162,7 @@ public class GraphView extends JPanel {
             g.setColor(currPnt.getColor());
             g.fillOval((int)currPnt.getX(), (int)currPnt.getY(), POINT_SIZE, POINT_SIZE);
         }
+        pntLegends.graphLegends(g);
         g.setColor(oldColor);
     }
 
@@ -190,7 +208,6 @@ public class GraphView extends JPanel {
             return interval;
         interval =  (int)Math.round(interval * (1.0 + 1.0/numIntervals) + 0.5);
         return interval;
-
     }
 
     private void DrawYAxisTicksAndLabels(int numIntervals, double maxY, Graphics g, boolean findTop) {
@@ -216,33 +233,52 @@ public class GraphView extends JPanel {
     }
 
     private String makeFormatString(double maxY) {
+        if (maxY <= 0.0)
+            return "%%5.1f";
+
         final double MAX_LOG = 3.0;
         return String.format("%%5.%df", Math.log10(maxY) >= MAX_LOG ? 0 : 1 );
     }
 
     private double findTopYValue(double max) {
-        final double LOG2 = Math.log10(2.0), LOG5 = Math.log10(5.0);
-        double logMax = Math.log10(max);
-        double logFraction = logMax % 1; // Java returns fractional part
-        double logAdd = 0.0;
+        if (max <= 0.0)
+            return TOP_Y_VALUE_DEFAULT;
 
-        if (logFraction > LOG5)
-            logAdd = 1.0;
-        else if (logFraction > LOG2)
-            logAdd = LOG5;
-        else if (logFraction > 0.0)
-            logAdd = LOG2;
-
-        return Math.pow(10.0,(int)logMax + logAdd);
+        double increment = Math.pow(10.0, Math.floor(Math.log10(max)));
+        return (1.0 + Math.floor(max / increment)) * increment;
     }
 
     private void TestColorDots(Graphics g) {
         Color oldColor = g.getColor();
         for (int i = 0; i < colorArray.length; ++i) {
             g.setColor(colorArray[i]);
-            g.fillOval(plottedXmax, plottedYmin - (i + 3) * 3 * POINT_SIZE, POINT_SIZE, POINT_SIZE);
+            g.fillOval(plottedXmax + POINT_SIZE, plottedYmin - (i + 3) * 3 * POINT_SIZE, POINT_SIZE, POINT_SIZE);
+
+            // complimentary color
+            g.setColor(getComplimentColor(colorArray[i]));
+            g.fillOval(plottedXmax + 2 * POINT_SIZE, plottedYmin - (i + 3) * 3 * POINT_SIZE, POINT_SIZE, POINT_SIZE);
         }
         g.setColor(oldColor);
     }
 
+    /**
+     * Returns the complimentary (opposite) color.
+     * Modified and adapted from: http://www.java2s.com/Code/Android/2D-Graphics/
+     * Returnsthecomplimentaryoppositecolor.htm
+     * @param color Color RGB color to return the compliment of
+     * @return Color RGB of compliment color
+     */
+    public static Color getComplimentColor(Color color) {
+        // get existing colors
+        int red = color.getRed();
+        int blue = color.getBlue();
+        int green = color.getGreen();
+
+        // find compliments
+        red = (~red) & 0xff;
+        blue = (~blue) & 0xff;
+        green = (~green) & 0xff;
+
+        return new Color(red, green, blue);
+    }
 }

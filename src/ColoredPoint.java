@@ -1,8 +1,6 @@
 import java.awt.*;
 
-/**
- * Created by Paul on 5/2/2017.
- */
+
 public class ColoredPoint extends Point {
     private Color color;
     private double originalX, originalY;
