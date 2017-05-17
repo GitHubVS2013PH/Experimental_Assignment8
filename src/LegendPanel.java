@@ -26,17 +26,23 @@ public class LegendPanel extends JPanel {
         Font oldFont = g.getFont();
         g.setFont(new Font("MONOSPACED",Font.PLAIN, 14));
 
-        int countryCntr = 0;
+        int countryCounter = 0;
         int lblWidth = MONO_SIZE * maxNameLength + 2 * LBL_DX;
         for (Country_Legend legend : legendList) {
-            int legYCurr = LEG_START_Y + NEXT_LEG_Y * countryCntr;
+            int legYCurr = LEG_START_Y + NEXT_LEG_Y * countryCounter;
             g.setColor(legend.getColor());
             g.fillRect(LEG__X, legYCurr, lblWidth, LBL_HEIGHT);
             g.setColor(getComplimentColor(legend.getColor()));
             g.drawString(legend.getName(),LEG__X + LBL_DX,legYCurr + LBL_DY);
-            ++countryCntr;
+            ++countryCounter;
         }
         g.setFont(oldFont);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {         // INVOKED AUTOMATICALLY WHEN ADDED OR RESIZED OR ...
+        super.paintComponent(g);
+        graphLegends(g);
     }
 
     /**
@@ -58,12 +64,6 @@ public class LegendPanel extends JPanel {
         green = (~green) & 0xff;
 
         return new Color(red, green, blue);
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {               // WHAT INVOKES THIS???
-        super.paintComponent(g);
-        graphLegends(g);
     }
 
     // inner class

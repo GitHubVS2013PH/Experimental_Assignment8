@@ -11,7 +11,7 @@ public class GraphView extends JPanel {
     private Font font;
 
     final private int YEARS_FOR_MAX = 10;
-    final private LegendPanel pntLegends = new LegendPanel();
+    final private LegendPanel pointLegends = new LegendPanel();
     final private LinkedList<ColoredPoint> graphPoints = new LinkedList<>();  // STRUCTURE SAME AS LEGENDS???
 
     // Data plotting parameters
@@ -23,9 +23,9 @@ public class GraphView extends JPanel {
     final private double TOP_Y_VALUE_DEFAULT = 200.0;
 
     // Legend graphing parameters
-    final int LBL_DX = 5, LBL_DY = 14; // text offset wrt label rectangle
-    final int LBL_WIDTH = 180, LBL_HEIGHT = 20, MONO_SIZE = 8; // label rectangle dimensions
-    final int LEG__X = 60, LEG_START_Y = 40, NEXT_LEG_Y = 25; // legend positions
+    final private int LBL_DX = 5, LBL_DY = 14; // text offset wrt label rectangle
+    final private int LBL_WIDTH = 180, LBL_HEIGHT = 20, MONO_SIZE = 8; // label rectangle dimensions
+    final private int LEG__X = 60, LEG_START_Y = 40, NEXT_LEG_Y = 25; // legend positions
 
     // Color scheme
     final private static Color[] colorArray = {Color.black, Color.blue, Color.cyan,
@@ -33,8 +33,8 @@ public class GraphView extends JPanel {
             Color.orange, Color.pink, Color.red, Color.yellow};
 
     public GraphView(int width, int height, LinkedList<Country> countries) {
-        //super(new GridLayout(1,2, 40,40)); // Call layout manager
-        // setSize(width,height);
+        //super(new GridLayout(1, 2, 40, 40)); // Call layout manager
+        //this.setSize(width ,height);
         this.width = width;
         this.height = height;
         font = new Font("Serif", Font.PLAIN, 11);
@@ -61,8 +61,6 @@ public class GraphView extends JPanel {
         dataMaxY = findTopYValue(dataMax); // "round up" to next whole value
 
         // map values and save
-        System.out.println("Window size (in GraphView) is: " + getSize());
-
         int countryCntr = 0;
         for(Country country : countries) {
             SubscriptionYear[] subYears = country.getSubscriptions();
@@ -73,7 +71,7 @@ public class GraphView extends JPanel {
                 ColoredPoint tempPnt = new ColoredPoint(pntColor, mappedX, mappedY, subYear.getYear(), subYear.getSubscriptions());
                 graphPoints.add(tempPnt);
             }
-            pntLegends.add(country.getName(), pntColor);
+            pointLegends.add(country.getName(), pntColor);
             ++countryCntr;
         }
     }
@@ -82,19 +80,12 @@ public class GraphView extends JPanel {
         return plottedMin + (plottedMax - plottedMin) * ((value - dataMin) / (dataMax - dataMin));
     }
 
+    LegendPanel getPointLegends() { return pointLegends; }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        //setSize(width, height);
-
-        // initialize graph variables
-//        plottedXmin = MARGIN;
-//        plottedYmin = getHeight() - MARGIN;
-//        plottedXmax = getWidth() - MARGIN;
-//        plottedYmax = MARGIN;
-
-        // width = getWidth(); height = getHeight();
-        // System.out.println("(In paintComponent) Width: " + width + " Height: " + height);
+        //TestColorDots(g); // test colors
 
         // draw x-axis and ticks
         g.drawLine(plottedXmin, plottedYmin, plottedXmax, plottedYmin);
@@ -105,64 +96,14 @@ public class GraphView extends JPanel {
         int numIntervals = findNumberYearIntervals(numYears);
         DrawYAxisTicksAndLabels(numIntervals, dataMaxY, g, false);
 
-        //g.drawString("Test", 300,300);
-        //g.fillOval(400, 400, POINT_SIZE, POINT_SIZE);
-
-//        int lblX = 80, lblY = 40, nxtY = 25;
-//        int lblDx = 5, lblDy = 14;
-//        LegendPanel.Country_Legend tmpLegend = pntLegends.getLegendList().getIndex(0);
-//        g.setColor(tmpLegend.getColor());
-//        g.fillRect(lblX,lblY,120,20);
-//        g.setColor(getComplimentColor(tmpLegend.getColor()));
-//        g.drawString(tmpLegend.getName(),lblX + lblDx,lblY + lblDy);
-//
-//        tmpLegend = pntLegends.getLegendList().getIndex(1);
-//        g.setColor(tmpLegend.getColor());
-//        g.fillRect(lblX,lblY + nxtY,120,20);
-//        g.setColor(getComplimentColor(tmpLegend.getColor()));
-//        g.drawString(tmpLegend.getName(),lblX + lblDx,lblY + lblDy + nxtY);
-
-
-
-        // testing ColorPoint including graphing it
-//        ColoredPoint myPnt = new ColoredPoint(Color.BLUE, 400,400,2014,20.4);
-//        g.setColor(myPnt.getColor());
-//        g.fillOval((int)myPnt.getX(), (int)myPnt.getY(), POINT_SIZE, POINT_SIZE);
-//        g.setColor(Color.BLACK);
-        // g.drawString(myPnt.getLabel(),400,400);
-
-        // place some points in known places (in the corners) for testing purposes
-//        System.out.println("(In paint component before test points) Height is: " + getHeight() + " width is: " + getWidth());
-//        double mappedX = map(dataMinX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
-//        double mappedY = map(dataMinY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
-//        g.setColor(Color.BLUE);
-//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-//
-//        mappedX = map(dataMaxX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
-//        mappedY = map(dataMinY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
-//        g.setColor(Color.RED);
-//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-//
-//        mappedX = map(dataMinX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
-//        mappedY = map(dataMaxY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
-//        g.setColor(Color.GREEN);
-//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-//
-//        mappedX = map(dataMaxX, dataMinX, dataMaxX, plottedXmin, plottedXmax) - POINT_SIZE / 2;
-//        mappedY = map(dataMaxY, dataMinY, dataMaxY, plottedYmin, plottedYmax) - POINT_SIZE / 2;
-//        g.setColor(Color.CYAN);
-//        g.fillOval((int)mappedX, (int)mappedY, POINT_SIZE, POINT_SIZE);
-
-//        // test colors
-//        TestColorDots(g);
-
         // graphs points in graphPoints LinkedList
         Color oldColor = g.getColor();
         for (ColoredPoint currPnt : graphPoints) {
             g.setColor(currPnt.getColor());
             g.fillOval((int)currPnt.getX(), (int)currPnt.getY(), POINT_SIZE, POINT_SIZE);
         }
-        pntLegends.graphLegends(g);
+        pointLegends.graphLegends(g);
+        //add(pointLegends); // doesn't add legend
         g.setColor(oldColor);
     }
 
@@ -206,8 +147,7 @@ public class GraphView extends JPanel {
         int interval = (numYears - 1) / numIntervals;
         if ((numYears - 1) % numIntervals == 0)
             return interval;
-        interval =  (int)Math.round(interval * (1.0 + 1.0/numIntervals) + 0.5);
-        return interval;
+        return (int)Math.round(interval * (1.0 + 1.0/numIntervals) + 0.5);
     }
 
     private void DrawYAxisTicksAndLabels(int numIntervals, double maxY, Graphics g, boolean findTop) {
@@ -233,10 +173,11 @@ public class GraphView extends JPanel {
     }
 
     private String makeFormatString(double maxY) {
+        final double MAX_LOG = 3.0;
+
         if (maxY <= 0.0)
             return "%%5.1f";
 
-        final double MAX_LOG = 3.0;
         return String.format("%%5.%df", Math.log10(maxY) >= MAX_LOG ? 0 : 1 );
     }
 
