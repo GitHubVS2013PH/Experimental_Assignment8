@@ -35,6 +35,16 @@ public class GraphView extends JPanel {
     public GraphView(int width, int height, LinkedList<Country> countries) {
         //super(new GridLayout(1, 2, 40, 40)); // Call layout manager
         //this.setSize(width ,height);
+
+        // new stuff
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createLineBorder(Color.CYAN));
+        setOpaque(true);
+        setForeground(Color.BLACK);
+        setBounds(0,0, width, height);
+        JPanel legends = new LegendPanel();
+        //////
+
         this.width = width;
         this.height = height;
         font = new Font("Serif", Font.PLAIN, 11);
@@ -83,9 +93,9 @@ public class GraphView extends JPanel {
     LegendPanel getPointLegends() { return pointLegends; }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        //TestColorDots(g); // test colors
+        // TestColorDots(g); // test colors
 
         // draw x-axis and ticks
         g.drawLine(plottedXmin, plottedYmin, plottedXmax, plottedYmin);
@@ -210,15 +220,9 @@ public class GraphView extends JPanel {
      * @return Color RGB of compliment color
      */
     public static Color getComplimentColor(Color color) {
-        // get existing colors
-        int red = color.getRed();
-        int blue = color.getBlue();
-        int green = color.getGreen();
-
-        // find compliments
-        red = (~red) & 0xff;
-        blue = (~blue) & 0xff;
-        green = (~green) & 0xff;
+        int red = (~color.getRed()) & 0xff;
+        int blue = (~color.getBlue()) & 0xff;
+        int green = (~color.getGreen()) & 0xff;
 
         return new Color(red, green, blue);
     }

@@ -40,8 +40,8 @@ public class LegendPanel extends JPanel {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {         // INVOKED AUTOMATICALLY WHEN ADDED OR RESIZED OR ...
-        super.paintComponent(g);
+    public void paintComponent(Graphics g) {         // INVOKED AUTOMATICALLY WHEN ADDED OR RESIZED OR ...
+        super.paintComponent(g);                     // See p.558 in Core Java for explanation
         graphLegends(g);
     }
 
